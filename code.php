@@ -1,7 +1,7 @@
 // BM Studio Code
 function redirect_non_logged_in_users() {
     $request_uri = esc_url_raw($_SERVER['REQUEST_URI']);
-    if (!is_user_logged_in() && !is_admin() && $GLOBALS['pagenow'] !== 'wp-login.php' && strpos($request_uri, '/community/register/') === false) {
+    if (!is_user_logged_in() && !is_admin() && $GLOBALS['pagenow'] !== 'wp-login.php' && strpos($request_uri, '/X/') === false) {
         wp_safe_redirect(wp_login_url());
         exit;
     }
