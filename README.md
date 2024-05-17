@@ -1,4 +1,4 @@
-![Non Logged Users](https://ideogram.ai/api/images/direct/NuLx8mclQbmnUVtJjY3GNw.png)
+![Non Logged Users](https://i.ibb.co/GPGt1Qt/Nu-Lx8mcl-Qbmn-UVt-Jj-Y3-GNw.png)
 
 Project Status: Active – The project has reached a stable, usable state and is being actively developed.
 ![https://www.repostatus.org/#wip](https://user-images.githubusercontent.com/76659584/211010037-f264dc21-57db-4158-b3b6-768ddf93db06.png)
