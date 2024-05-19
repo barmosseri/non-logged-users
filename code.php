@@ -1,12 +1,27 @@
 // BM Studio Code
-function redirect_non_logged_in_users() {
+function redirect_non_logged_in_or_pending_users() {
     $request_uri = esc_url_raw($_SERVER['REQUEST_URI']);
-    if (!is_user_logged_in() && !is_admin() && $GLOBALS['pagenow'] !== 'wp-login.php' && strpos($request_uri, '/X/') === false) {
+    $allowed_pages = ['/wp-login.php', '{your-register-page}', '/wp-login.php?action=lostpassword'];
+
+    $is_allowed_page = false;
+    foreach ($allowed_pages as $page) {
+        if (strpos($request_uri, $page) !== false) {
+            $is_allowed_page = true;
+            break;
+        }
+    }
+
+    if (!is_user_logged_in() && !$is_allowed_page) {
+        wp_safe_redirect(wp_login_url());
+        exit;
+    }
+
+    if (is_user_logged_in() && current_user_can('pending') && !$is_allowed_page) {
         wp_safe_redirect(wp_login_url());
         exit;
     }
 }
-add_action('init', 'redirect_non_logged_in_users');
+add_action('init', 'redirect_non_logged_in_or_pending_users');
 
 function custom_login_message($message) {
     if (isset($_GET['registration']) && sanitize_text_field($_GET['registration']) === 'pending') {
@@ -24,7 +39,7 @@ function notify_user_registration_pending($user_id) {
     $subject = 'Registration Pending Approval';
     $message = 'Thank you for registering. Your account is pending approval by the site administrators.';
     
-    wp_mail($to, sanitize_text_eld($subject), sanitize_textarea_field($message));
+    wp_mail($to, sanitize_text_field($subject), sanitize_textarea_field($message));
 }
 add_action('user_register', 'notify_user_registration_pending');
 
@@ -34,13 +49,31 @@ function redirect_after_registration($user_id) {
 }
 add_action('user_register', 'redirect_after_registration');
 
-function set_pending_role_on_regisfitration($user_id) {
+function set_pending_role_on_registration($user_id) {
     $user = new WP_User($user_id);
     if (!in_array('administrator', $user->roles)) {
         $user->set_role('pending');
     }
 }
 add_action('user_register', 'set_pending_role_on_registration');
+
+function redirect_pending_users_on_login($user, $username) {
+    $user = get_user_by('login', $username);
+    if ($user && in_array('pending', (array) $user->roles)) {
+        wp_safe_redirect(wp_login_url() . '?registration=pending-for-approval');
+        exit;
+    }
+}
+add_action('wp_authenticate', 'redirect_pending_users_on_login', 10, 2);
+
+function custom_pending_approval_message($message) {
+    if (isset($_GET['registration']) && sanitize_text_field($_GET['registration']) === 'pending-for-approval') {
+        $message = "<div id='login_error' class='notice notice-error'><p>Your account is pending approval by the site manager. You will be notified via email once your registration has been approved.</p></div>";
+    }
+    return $message;
+}
+add_filter('login_message', 'custom_pending_approval_message');
+
 
 function notify_user_when_approved($user_id, $new_role, $old_roles) {
     if (in_array('pending', $old_roles) && $new_role !== 'pending') {
