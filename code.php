@@ -1,7 +1,7 @@
 // BM Studio Code
 function redirect_non_logged_in_or_pending_users() {
     $request_uri = esc_url_raw($_SERVER['REQUEST_URI']);
-    $allowed_pages = ['/wp-login.php', '{your-register-page}', '/wp-login.php?action=lostpassword'];
+    $allowed_pages = ['/wp-login.php', '/community/register/', '/wp-login.php?action=lostpassword'];
 
     $is_allowed_page = false;
     foreach ($allowed_pages as $page) {
@@ -74,7 +74,6 @@ function custom_pending_approval_message($message) {
 }
 add_filter('login_message', 'custom_pending_approval_message');
 
-
 function notify_user_when_approved($user_id, $new_role, $old_roles) {
     if (in_array('pending', $old_roles) && $new_role !== 'pending') {
         $user_info = get_userdata($user_id);
@@ -86,3 +85,14 @@ function notify_user_when_approved($user_id, $new_role, $old_roles) {
     }
 }
 add_action('set_user_role', 'notify_user_when_approved', 10, 3);
+
+function notify_admins_on_user_registration($user_id) {
+    $administrators = get_users(array('role' => 'administrator'));
+    foreach ($administrators as $admin) {
+        $to = $admin->user_email;
+        $subject = 'New User Registration';
+        $message = 'A new user has registered on your website.';
+        wp_mail($to, sanitize_text_field($subject), sanitize_textarea_field($message));
+    }
+}
+add_action('user_register', 'notify_admins_on_user_registration');
