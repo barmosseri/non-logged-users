@@ -10,7 +10,7 @@ add_action('init', 'allow_password_reset_access');
 
 function redirect_non_logged_in_or_pending_users() {
     $request_uri = esc_url_raw($_SERVER['REQUEST_URI']);
-    $allowed_pages = ['/wp-login.php', '/register/', '/wp-login.php?action=lostpassword'];
+    $allowed_pages = ['/wp-login.php', '/register/', '/wp-login.php?action=lostpassword', '/wp-json/'];
 
     $is_allowed_page = false;
     foreach ($allowed_pages as $page) {
