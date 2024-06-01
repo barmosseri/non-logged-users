@@ -5,7 +5,7 @@ Project Status: Active – The project has reached a stable, usable state and is
 
 #  Non Logged Users
 
-This script used to automate the process of creating users in Okta based on tickets in Zendesk. It allows only certain approved users to approve the creation of a user, and uses custom fields on the ticket to determine the details for the user to be created in Okta. It also updates the ticket with comments indicating the status of the user creation process and, if successful, marks the ticket as solved.
+These functions grants admin control over user registration. Unregistered users are redirected to login. Registered users await approval in a "pending" role. After approval, they're notified and gain access. Secure practices include data sanitization and using WordPress' built-in redirect functions.
 
 # Full information
 This code snippet implements a system for user registration with admin approval on a WordPress website. Here's a breakdown of its goals, functionalities, and security measures:
